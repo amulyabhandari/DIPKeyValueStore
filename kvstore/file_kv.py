@@ -4,14 +4,11 @@ from typing import Optional
 
 class FilePerKeyKV:
     """
-    Extremely simple key/value store:
-    - One file per key in a directory.
-    - set: write the whole file.
-    - get: read the file.
-    - delete: remove the file.
+    Simple filesystem-based key/value store.
 
-    This is intentionally naive and uses the filesystem directly
-    without any log-structured optimization.
+    - One file per key.
+    - Direct path lookup for reads and deletes.
+    - Normal writes without forced fsync.
     """
 
     def __init__(self, dirpath: str):
@@ -19,24 +16,25 @@ class FilePerKeyKV:
         os.makedirs(self.dirpath, exist_ok=True)
 
     def _key_path(self, key: str) -> str:
-        # very simple mapping: file name is the key itself
-        # (safe because in benchmarks we use keys like "key_123").
         return os.path.join(self.dirpath, key)
 
     def set(self, key: str, value) -> None:
         path = self._key_path(key)
+
         if isinstance(value, bytes):
             data = value
         else:
             data = str(value).encode("utf-8")
+
+        # simple write (fast, no fsync)
         with open(path, "wb") as f:
             f.write(data)
-            f.flush()
 
     def get(self, key: str) -> Optional[bytes]:
         path = self._key_path(key)
         if not os.path.exists(path):
             return None
+
         with open(path, "rb") as f:
             return f.read()
 
@@ -45,6 +43,5 @@ class FilePerKeyKV:
         if os.path.exists(path):
             os.remove(path)
 
-    def close(self) -> None:
-        # added for compatibility with LogStructuredKV interface
+    def close(self):
         pass
