@@ -7,7 +7,6 @@ import string
 from kvstore.log_kv import LogStructuredKV
 from kvstore.file_kv import FilePerKeyKV
 
-# All benchmark data goes under this base directory
 BASE_DATA_DIR = "data"
 
 
