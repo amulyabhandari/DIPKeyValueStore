@@ -19,6 +19,8 @@ This repository contains:
 ---
 
 ## Project Structure
+
+```text
 .
 ├── kvstore/
 │   ├── log_kv.py          # Log-structured Bitcask-style key/value store
@@ -29,6 +31,7 @@ This repository contains:
 ├── benchmark.py           # Benchmark focused on LogStructuredKV with configurable parameters
 └── data/                  # Auto-created directory used for persistence during execution
 
+```
 ---
 
 ## Architectural Overview
@@ -61,6 +64,7 @@ A simplified Bitcask-style storage engine. Each update is appended to a log file
 
 Each appended record uses a fixed binary format:
 
+```text
 +----------+----------+--------+-------------------+--------------------+
 | key_len  | val_len  | tomb   |     key_bytes     |    value_bytes     |
 |  4 bytes | 4 bytes  | 1 byte |    variable       |     variable       |
@@ -71,6 +75,7 @@ Each appended record uses a fixed binary format:
       |        |         +-- deletion flag (0=normal, 1=tombstone)
       |        +-- length of value in bytes
       +-- length of key in bytes
+```
 
 - `key_len` and `val_len` specify the sizes of the following byte sequences.  
 - `tomb` marks deletion without removing older records.
@@ -110,11 +115,13 @@ Each appended record uses a fixed binary format:
 
 This simpler variant maps each key directly to a file in the filesystem.
 
+```text
 data/fs/
 ├── key_00001
 ├── key_00002
 ├── key_00003
 └── ...
+```
 
 #### Operation Flow
 
@@ -220,6 +227,8 @@ delete <key>
 compact
 exit
 
+---
+
 ## Benchmarking
 
 Two benchmark tools are provided to evaluate storage performance under different workloads.
@@ -233,11 +242,9 @@ python benchmark.py --num-ops 20000 --value-size 100
 ```
 Arguments:
 
---num-ops : number of SET / GET / DELETE operations (default: 20000)
-
---value-size : size of randomly generated values in bytes (default: 100)
-
---data-dir : directory used to store benchmark log files
+- `--num-ops` : number of SET / GET / DELETE operations (default: 20000)
+- `--value-size` : size of randomly generated values in bytes (default: 100)
+- `--data-dir` : directory used to store benchmark log files
 
 This benchmark isolates the behavior of the append-only log design, making it easier to evaluate how record layout, indexing strategy, and compaction impact throughput.
 
