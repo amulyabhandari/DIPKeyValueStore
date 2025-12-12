@@ -82,7 +82,7 @@ Each appended record uses a fixed binary format:
 
 #### Operation Flow
 
-**SET(key, value)**  
+**PUT(key, value)**  
 - Rotate `active.log` if size threshold is reached  
 - Append header + key + value  
 - Update the in-memory index  
